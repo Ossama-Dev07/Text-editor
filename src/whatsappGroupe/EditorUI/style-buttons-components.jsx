@@ -17,12 +17,12 @@ import {
 } from "@/components/ui/popover";
 
 export const TABLE_COLORS = [
-  { bg: "", border: "border-border" },
-  { bg: "bg-blue-400", border: "border-blue-200" },
-  { bg: "bg-green-400", border: "border-green-200" },
-  { bg: "bg-orange-400", border: "border-orange-200" },
-  { bg: "bg-red-400", border: "border-red-200" },
-  { bg: "bg-yellow-400", border: "border-yellow-200" },
+  { text: "text-black", bg: "", border: "border-border" },
+  { text: "text-blue-400", bg: "bg-blue-400", border: "border-blue-200" },
+  { text: "text-green-400", bg: "bg-green-400", border: "border-green-200" },
+  { text: "text-orange-400", bg: "bg-orange-400", border: "border-orange-200" },
+  { text: "text-red-400", bg: "bg-red-400", border: "border-red-200" },
+  { text: "text-yellow-400", bg: "bg-yellow-400", border: "border-yellow-200" },
 ];
 
 export const StyleButtons = ({
@@ -32,24 +32,7 @@ export const StyleButtons = ({
   onColorChange,
 }) => {
   return (
-    <>
-      <div className="grid gap-2">
-        <ToggleGroup
-          type="single"
-          value={alignment}
-          onValueChange={onAlignmentChange}
-        >
-          <ToggleGroupItem value="left" aria-label="Align left">
-            <AlignLeft className="h-4 w-4" />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="center" aria-label="Align center">
-            <AlignCenter className="h-4 w-4" />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="right" aria-label="Align right">
-            <AlignRight className="h-4 w-4" />
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
+    <> 
       <div className="grid gap-2">
         <ToggleGroup type="multiple">
           <ToggleGroupItem
@@ -85,12 +68,29 @@ export const StyleButtons = ({
                   <button
                     key={idx}
                     className={`w-8 h-8 rounded ${color.bg} ${color.border} border-2 transition-opacity hover:opacity-80`}
-                    onClick={() => onColorChange(color.bg, color.border)}
+                    onClick={() => onColorChange(color.text, color.border)}
                   />
                 ))}
               </div>
             </PopoverContent>
           </Popover>
+        </ToggleGroup>
+      </div>
+      <div className="grid gap-2">
+        <ToggleGroup
+          type="single"
+          value={alignment}
+          onValueChange={onAlignmentChange}
+        >
+          <ToggleGroupItem value="left" aria-label="Align left">
+            <AlignLeft className="h-4 w-4" />
+          </ToggleGroupItem>
+          <ToggleGroupItem value="center" aria-label="Align center">
+            <AlignCenter className="h-4 w-4" />
+          </ToggleGroupItem>
+          <ToggleGroupItem value="right" aria-label="Align right">
+            <AlignRight className="h-4 w-4" />
+          </ToggleGroupItem>
         </ToggleGroup>
       </div>
     </>

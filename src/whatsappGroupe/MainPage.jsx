@@ -31,13 +31,13 @@ export default function MainPage() {
     }
   };
 
-  const handleColorChange = (bgColor, borderColor) => {
+  const handleColorChange = (textColor, borderColor) => {
     if (window.getSelection) {
       const selection = window.getSelection();
       if (selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
         const span = document.createElement("span");
-        span.className = `${bgColor} ${borderColor} px-1 rounded`;
+        span.className = `${textColor} ${borderColor} px-1 rounded`;
         range.surroundContents(span);
       }
     }
@@ -88,20 +88,22 @@ export default function MainPage() {
           <div className="h-full py-6" dir="rtl">
             <div className="grid h-full items-stretch gap-10 md:grid-cols-[1fr_200px]">
               <div className="flex-col space-y-4 sm:flex md:order-2">
-                <FontSizeSelect
-                  fontSize={fontSize}
-                  onFontSizeChange={handleFontSizeChange}
-                />
-                <FontFamilySelect
-                  fontFamily={fontFamily}
-                  onFontFamilyChange={handleFontFamilyChange}
-                />
                 <StyleButtons
                   alignment={alignment}
                   onAlignmentChange={handleAlignmentChange}
                   onTextStyleChange={handleTextStyle}
                   onColorChange={handleColorChange}
                 />
+                <div className="flex space-x-4">
+                  <FontSizeSelect
+                    fontSize={fontSize}
+                    onFontSizeChange={handleFontSizeChange}
+                  />
+                  <FontFamilySelect
+                    fontFamily={fontFamily}
+                    onFontFamilyChange={handleFontFamilyChange}
+                  />
+                </div>
               </div>
               <div className="md:order-1">
                 <TabsContent value="complete" className="mt-0 border-0 p-0">
@@ -121,7 +123,10 @@ export default function MainPage() {
                       <Button>Submit</Button>
                       <Button variant="secondary">
                         <span className="sr-only">Show history</span>
-                        <CounterClockwiseClockIcon className="h-4 w-4" />
+                        <CounterClockwiseClockIcon
+                          variant="disractive"
+                          className="h-4 w-4"
+                        />
                       </Button>
                     </div>
                   </div>
