@@ -24,9 +24,8 @@ import {
   Quote,
   Underline,
 } from "lucide-react";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { CounterClockwiseClockIcon } from "@radix-ui/react-icons";
 import { PresetSelector } from "./components/preset-selector";
 import { PresetSave } from "./components/preset-save";
 import { CodeViewer } from "./components/code-viewer";
@@ -34,9 +33,12 @@ import { PresetShare } from "./components/preset-share";
 import { PresetActions } from "./components/preset-actions";
 import { presets } from "./data/presets";
 import {
-  FontSizeSelect,
-  FontFamilySelect,
-} from "./EditorUI/font-select-components";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 
 const HOTKEYS = {
   "ctrl+b": "bold",
@@ -73,13 +75,40 @@ const MainPage = () => {
       <Tabs>
         <Slate editor={editor} initialValue={initialValue}>
           <div className="h-full py-6">
-            <div className="grid h-full gap-10 md:flex ">
-              <div className="md:order-2">
+            <div className="grid h-full gap-6 md:grid-cols-[auto_1fr]">
+              {/* Button Toolbar */}
+              <div className="flex flex-col space-y-6 pt-28">
+                {/* Text Formatting Buttons */}
+                <div className="flex space-x-2 p-2 bg-gray-100 rounded-lg">
+                  <MarkButton format="bold" icon={<Bold />} />
+                  <MarkButton format="italic" icon={<Italic />} />
+                  <MarkButton format="underline" icon={<Underline />} />
+                  <MarkButton format="code" icon={<Code />} />
+                </div>
+
+                {/* Block Formatting Buttons */}
+                <div className="flex space-x-2 p-2 bg-gray-100 rounded-lg">
+                  <BlockButton format="heading-one" icon={<Heading1 />} />
+                  <BlockButton format="heading-two" icon={<Heading2 />} />
+                  <BlockButton format="numbered-list" icon={<ListOrdered />} />
+                  <BlockButton format="bulleted-list" icon={<List />} />
+                </div>
+
+                {/* Alignment Buttons */}
+                <div className="flex space-x-2 p-2 bg-gray-100 rounded-lg">
+                  <BlockButton format="left" icon={<AlignLeft />} />
+                  <BlockButton format="center" icon={<AlignCenter />} />
+                  <BlockButton format="right" icon={<AlignRight />} />
+                  <BlockButton format="justify" icon={<AlignJustify />} />
+                </div>
+              </div>
+
+              {/* Editable Area */}
+              <div className="w-full lg:pr-5 md:pr-5">
                 <Editable
-                  className="h-[600px] mr-[10px] w-[50%]"
+                  className="w-full h-[500px] p-5 border rounded-md overflow-hidden"
                   renderElement={renderElement}
                   renderLeaf={renderLeaf}
-                  placeholder="Enter some rich text…"
                   spellCheck
                   autoFocus
                   onKeyDown={(event) => {
@@ -92,21 +121,6 @@ const MainPage = () => {
                     }
                   }}
                 />
-              </div>
-              <div className="flex- space-y-4 sm:flex md:order-1 ">
-                <MarkButton format="bold" icon={<Bold />} />
-                <MarkButton format="italic" icon={<Italic />} />
-                <MarkButton format="underline" icon={<Underline />} />
-                <MarkButton format="code" icon={<Code />} />
-                <BlockButton format="heading-one" icon={<Heading1 />} />
-                <BlockButton format="heading-two" icon={<Heading2 />} />
-                <BlockButton format="block-quote" icon={<Quote />} />
-                <BlockButton format="numbered-list" icon={<ListOrdered />} />
-                <BlockButton format="bulleted-list" icon={<List />} />
-                <BlockButton format="left" icon={<AlignLeft />} />
-                <BlockButton format="center" icon={<AlignCenter />} />
-                <BlockButton format="right" icon={<AlignRight />} />
-                <BlockButton format="justify" icon={<AlignJustify />} />
               </div>
             </div>
           </div>
@@ -243,8 +257,19 @@ const Leaf = ({ attributes, children, leaf }) => {
 const BlockButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
     <Button
-      variant={isBlockActive(editor, format) ? "default" : "outline"} // shadcn button styles
+      variant={
+        isBlockActive(
+          editor,
+          format,
+          TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
+        )
+          ? "default"
+          : "outline"
+      }
       size="sm"
       onMouseDown={(event) => {
         event.preventDefault();
@@ -252,23 +277,39 @@ const BlockButton = ({ format, icon }) => {
       }}
     >
       {icon}
-    </Button>
+        </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{format}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  
   );
 };
 
-const MarkButton = ({ format, icon }) => {
+const MarkButton = ({ format, icon, name }) => {
   const editor = useSlate();
   return (
-    <Button
-      variant={isMarkActive(editor, format) ? "default" : "outline"} // shadcn button styles
-      size="sm"
-      onMouseDown={(event) => {
-        event.preventDefault();
-        toggleMark(editor, format);
-      }}
-    >
-      {icon}
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant={isMarkActive(editor, format) ? "default" : "outline"}
+            size="sm"
+            onMouseDown={(event) => {
+              event.preventDefault();
+              toggleMark(editor, format);
+            }}
+          >
+            {icon}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{format}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 
