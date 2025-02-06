@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useMemo } from "react";
 import isHotkey from "is-hotkey";
 import { Editable, withReact, useSlate, Slate } from "slate-react";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Editor,
   Transforms,
@@ -8,7 +10,7 @@ import {
   Element as SlateElement,
 } from "slate";
 import { withHistory } from "slate-history";
-import { Button } from "@/components/ui/button"; // Import shadcn Button
+import { Button } from "@/components/ui/button";
 import {
   AlignCenter,
   AlignJustify,
@@ -43,7 +45,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"; // Added Popover for color picker
+} from "@/components/ui/popover"; 
 import { CounterClockwiseClockIcon } from "@radix-ui/react-icons";
 
 const HOTKEYS = {
@@ -79,28 +81,29 @@ const MainPage = () => {
     <div className="w-full min-h-screen bg-gray-50">
       <div className="w-full px-4">
         <div
-        className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16"
-        dir="rtl"
-      >
-        <h2 className="text-lg font-semibold">Playground</h2>
-        <div className="ml-auto flex w-full space-x-2 sm:justify-end">
-          <PresetSelector presets={presets} />
-          <PresetSave />
-          <div className="space-x-2 md:flex">
-            <CodeViewer />
-            <PresetShare />
-          </div>
-          <PresetActions />
+          className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16"
+          dir="rtl"
+        >
+          <h1 className="text-xl font-semibold">Whatsapp</h1>
         </div>
-      </div>
-      <Separator />
+        <Separator />
 
         <Tabs>
           <Slate editor={editor} initialValue={initialValue}>
             <div className="py-8">
               <div className="grid gap-8 md:grid-cols-[320px_1fr]">
                 <div className="space-y-6">
-                  <div className="bg-white rounded-lg shadow-sm p-6 space-y-8">
+                  <div className="bg-white rounded-lg shadow-sm p-6 space-y-8" dir="rtl">
+                    <RadioGroup defaultValue="pdf" dir="rtl">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="pdf" id="r2" defaultValue />
+                        <Label htmlFor="r2">Message Format Pdf</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="wtsp" id="r3" />
+                        <Label htmlFor="r3">Message Format Whatsapp</Label>
+                      </div>
+                    </RadioGroup>
                     <div className="space-y-3">
                       <p className="text-sm font-medium text-gray-500">
                         Text Formatting
@@ -224,7 +227,7 @@ const MainPage = () => {
           </Slate>
         </Tabs>
 
-        <div className="flex justify-end  space-x-2" >
+        <div className="flex justify-end  space-x-2">
           <Button variant="outline" className="px-4">
             <CounterClockwiseClockIcon className="w-5 h-5" />
             <span className="sr-only">Show history</span>
