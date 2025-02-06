@@ -7,17 +7,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useState } from "react"; // Added useState for feedback
-
+import { useState } from "react";
 export function PresetShare() {
-  const [isCopied, setIsCopied] = useState(false); // State to track if text is copied
+  const [isCopied, setIsCopied] = useState(false);
 
-  // Function to handle copying the link
   const handleCopyLink = () => {
     const link = document.getElementById("link").value;
     navigator.clipboard.writeText(link).then(() => {
       setIsCopied(true); // Show "Copied" feedback
-      setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
+      setTimeout(() => setIsCopied(false), 2000);
     });
   };
 
@@ -50,15 +48,15 @@ export function PresetShare() {
             type="submit"
             size="sm"
             className="px-3"
-            onClick={handleCopyLink} // Add click handler
+            onClick={handleCopyLink}
           >
             {isCopied ? (
               <>
-                <CheckIcon className="h-4 w-4" /> {/* Show check icon */}
+                <CheckIcon className="h-4 w-4" />
               </>
             ) : (
               <>
-                <CopyIcon className="h-4 w-4" /> {/* Show copy icon */}
+                <CopyIcon className="h-4 w-4" />
               </>
             )}
           </Button>

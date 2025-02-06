@@ -449,7 +449,7 @@ const initialValue = [
     ],
   },
   {
-    type: "block-quote",
+    type: "paragraph",
     children: [{ text: "A wise quote." }],
   },
   {
