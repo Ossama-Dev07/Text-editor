@@ -26,6 +26,7 @@ import {
   Quote,
   Underline,
   Palette,
+  Eraser,
 } from "lucide-react"; // Added Palette icon
 import { Tabs } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -45,7 +46,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"; 
+} from "@/components/ui/popover";
 import { CounterClockwiseClockIcon } from "@radix-ui/react-icons";
 
 const HOTKEYS = {
@@ -76,7 +77,49 @@ const MainPage = () => {
   const handleColorChange = (color) => {
     Editor.addMark(editor, "color", color);
   };
+   const handleReset = (editor) => {
+     const { selection } = editor;
 
+     if (selection) {
+       
+       Editor.withoutNormalizing(editor, () => {
+         // Clear all marks (inline styles)
+         const marks = Editor.marks(editor);
+         if (marks) {
+           Object.keys(marks).forEach((mark) => {
+             Editor.removeMark(editor, mark);
+           });
+         }
+
+         // Reset block formatting (type and alignment)
+         Transforms.setNodes(
+           editor,
+           { type: "paragraph", align: undefined },
+           { match: (n) => SlateElement.isElement(n) }
+         );
+       });
+     } else {
+       // If there is no selection, reset the entire editor
+       Editor.withoutNormalizing(editor, () => {
+         // Clear all marks (inline styles) for the entire editor
+         Transforms.unsetNodes(editor, [], {
+           match: (n) =>
+             Editor.isEditor(n)
+               ? false
+               : SlateElement.isElement(n)
+               ? false
+               : true, // Match text nodes
+         });
+
+         // Reset block formatting (type and alignment) for the entire editor
+         Transforms.setNodes(
+           editor,
+           { type: "paragraph", align: undefined },
+           { match: (n) => SlateElement.isElement(n) }
+         );
+       });
+     }
+   };
   return (
     <div className="w-full min-h-screen bg-gray-50">
       <div className="w-full px-4">
@@ -93,7 +136,10 @@ const MainPage = () => {
             <div className="py-8">
               <div className="grid gap-8 md:grid-cols-[320px_1fr]">
                 <div className="space-y-6">
-                  <div className="bg-white rounded-lg shadow-sm p-6 space-y-8" dir="rtl">
+                  <div
+                    className="bg-white rounded-lg shadow-sm p-6 space-y-8"
+                    dir="rtl"
+                  >
                     <RadioGroup defaultValue="pdf" dir="rtl">
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="pdf" id="r2" defaultValue />
@@ -158,16 +204,16 @@ const MainPage = () => {
                       </p>
                       <div className="flex flex-wrap gap-2">
                         <BlockButton
-                          format="left"
-                          icon={<AlignLeft className="w-5 h-5" />}
+                          format="right"
+                          icon={<AlignRight className="w-5 h-5" />}
                         />
                         <BlockButton
                           format="center"
                           icon={<AlignCenter className="w-5 h-5" />}
                         />
                         <BlockButton
-                          format="right"
-                          icon={<AlignRight className="w-5 h-5" />}
+                          format="left"
+                          icon={<AlignLeft className="w-5 h-5" />}
                         />
                         <BlockButton
                           format="justify"
@@ -176,30 +222,47 @@ const MainPage = () => {
                       </div>
                     </div>
 
-                    <div className="space-y-3">
-                      <p className="text-sm font-medium text-gray-500">Color</p>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="default"
-                            className="w-10 h-10 p-0"
-                          >
-                            <Palette className="w-5 h-5" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-48 p-3">
-                          <div className="grid grid-cols-3 gap-3">
-                            {COLORS.map((color, idx) => (
-                              <button
-                                key={idx}
-                                className={`w-10 h-10 rounded-lg ${color.name} hover:ring-2 ring-offset-2 transition-all`}
-                                onClick={() => handleColorChange(color.value)}
-                              />
-                            ))}
-                          </div>
-                        </PopoverContent>
-                      </Popover>
+                    <div className=" flex items-center justify-  gap-2">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Reset
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="default"
+                          className="w-10 h-10 p-0"
+                          onClick={() => handleReset(editor)}
+                        >
+                          <Eraser />
+                        </Button>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Color
+                        </p>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="default"
+                              className="w-10 h-10 p-0"
+                            >
+                              <Palette className="w-5 h-5" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-48 p-3">
+                            <div className="grid grid-cols-3 gap-3">
+                              {COLORS.map((color, idx) => (
+                                <button
+                                  key={idx}
+                                  className={`w-10 h-10 rounded-lg ${color.name} hover:ring-2 ring-offset-2 transition-all`}
+                                  onClick={() => handleColorChange(color.value)}
+                                />
+                              ))}
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
                     </div>
                   </div>
                 </div>
