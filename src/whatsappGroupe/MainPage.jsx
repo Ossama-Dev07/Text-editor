@@ -67,8 +67,8 @@ const COLORS = [
   { name: "bg-yellow-500", value: "text-yellow-500" },
   { name: "bg-purple-500", value: "text-purple-500" },
 ];
-
 const MainPage = () => {
+  const [messageFormat, setMessageFormat] = useState("wtsp");
   const renderElement = useCallback((props) => <Element {...props} />, []);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
@@ -77,49 +77,48 @@ const MainPage = () => {
   const handleColorChange = (color) => {
     Editor.addMark(editor, "color", color);
   };
-   const handleReset = (editor) => {
-     const { selection } = editor;
+  const handleReset = (editor) => {
+    const { selection } = editor;
 
-     if (selection) {
-       
-       Editor.withoutNormalizing(editor, () => {
-         // Clear all marks (inline styles)
-         const marks = Editor.marks(editor);
-         if (marks) {
-           Object.keys(marks).forEach((mark) => {
-             Editor.removeMark(editor, mark);
-           });
-         }
+    if (selection) {
+      Editor.withoutNormalizing(editor, () => {
+        // Clear all marks (inline styles)
+        const marks = Editor.marks(editor);
+        if (marks) {
+          Object.keys(marks).forEach((mark) => {
+            Editor.removeMark(editor, mark);
+          });
+        }
 
-         // Reset block formatting (type and alignment)
-         Transforms.setNodes(
-           editor,
-           { type: "paragraph", align: undefined },
-           { match: (n) => SlateElement.isElement(n) }
-         );
-       });
-     } else {
-       // If there is no selection, reset the entire editor
-       Editor.withoutNormalizing(editor, () => {
-         // Clear all marks (inline styles) for the entire editor
-         Transforms.unsetNodes(editor, [], {
-           match: (n) =>
-             Editor.isEditor(n)
-               ? false
-               : SlateElement.isElement(n)
-               ? false
-               : true, // Match text nodes
-         });
+        // Reset block formatting (type and alignment)
+        Transforms.setNodes(
+          editor,
+          { type: "paragraph", align: undefined },
+          { match: (n) => SlateElement.isElement(n) }
+        );
+      });
+    } else {
+      // If there is no selection, reset the entire editor
+      Editor.withoutNormalizing(editor, () => {
+        // Clear all marks (inline styles) for the entire editor
+        Transforms.unsetNodes(editor, [], {
+          match: (n) =>
+            Editor.isEditor(n)
+              ? false
+              : SlateElement.isElement(n)
+              ? false
+              : true, // Match text nodes
+        });
 
-         // Reset block formatting (type and alignment) for the entire editor
-         Transforms.setNodes(
-           editor,
-           { type: "paragraph", align: undefined },
-           { match: (n) => SlateElement.isElement(n) }
-         );
-       });
-     }
-   };
+        // Reset block formatting (type and alignment) for the entire editor
+        Transforms.setNodes(
+          editor,
+          { type: "paragraph", align: undefined },
+          { match: (n) => SlateElement.isElement(n) }
+        );
+      });
+    }
+  };
   return (
     <div className="w-full min-h-screen bg-gray-50">
       <div className="w-full px-4">
@@ -140,14 +139,19 @@ const MainPage = () => {
                     className="bg-white rounded-lg shadow-sm p-6 space-y-8"
                     dir="rtl"
                   >
-                    <RadioGroup defaultValue="pdf" dir="rtl">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="pdf" id="r2" defaultValue />
-                        <Label htmlFor="r2">Message Format Pdf</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
+                    <RadioGroup
+                      value={messageFormat}
+                      onValueChange={setMessageFormat}
+                      className="space-y-4 space-y-4"
+                      dir="rtl"
+                    >
+                      <div className="flex items-center gap-1 space-x-2">
                         <RadioGroupItem value="wtsp" id="r3" />
-                        <Label htmlFor="r3">Message Format Whatsapp</Label>
+                        <Label htmlFor="r3">Message Format WhatsApp</Label>
+                      </div>
+                      <div className="flex items-center gap-1 space-x-2">
+                        <RadioGroupItem value="pdf" id="r2" />
+                        <Label htmlFor="r2">Message Format PDF</Label>
                       </div>
                     </RadioGroup>
                     <div className="space-y-3">
@@ -182,18 +186,22 @@ const MainPage = () => {
                         <BlockButton
                           format="heading-one"
                           icon={<Heading1 className="w-5 h-5" />}
+                          msgformat={messageFormat}
                         />
                         <BlockButton
                           format="heading-two"
                           icon={<Heading2 className="w-5 h-5" />}
+                          msgformat={messageFormat}
                         />
                         <BlockButton
                           format="numbered-list"
                           icon={<ListOrdered className="w-5 h-5" />}
+                          msgformat={messageFormat}
                         />
                         <BlockButton
                           format="bulleted-list"
                           icon={<List className="w-5 h-5" />}
+                          msgformat={messageFormat}
                         />
                       </div>
                     </div>
@@ -233,6 +241,7 @@ const MainPage = () => {
                           className="w-10 h-10 p-0"
                           onClick={() => handleReset(editor)}
                         >
+                       
                           <Eraser />
                         </Button>
                       </div>
@@ -246,6 +255,7 @@ const MainPage = () => {
                               variant="outline"
                               size="default"
                               className="w-10 h-10 p-0"
+                              disabled={messageFormat === "wtsp"}
                             >
                               <Palette className="w-5 h-5" />
                             </Button>
@@ -431,7 +441,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   return <span {...attributes}>{children}</span>;
 };
 
-const BlockButton = ({ format, icon }) => {
+const BlockButton = ({ format, icon ,msgformat}) => {
   const editor = useSlate();
   return (
     <TooltipProvider>
@@ -452,8 +462,10 @@ const BlockButton = ({ format, icon }) => {
               event.preventDefault();
               toggleBlock(editor, format);
             }}
+            disabled={msgformat === "wtsp"}
           >
             {icon}
+            
           </Button>
         </TooltipTrigger>
         <TooltipContent>
@@ -520,7 +532,7 @@ const initialValue = [
   },
   {
     type: "paragraph",
-    align: "center",
+    align:"center",
     children: [{ text: "Try it out for yourself!" }],
   },
 ];
