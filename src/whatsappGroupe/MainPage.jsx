@@ -23,7 +23,8 @@ import {
   ListOrdered,
   Quote,
   Underline,
-} from "lucide-react";
+  Palette,
+} from "lucide-react"; // Added Palette icon
 import { Tabs } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { PresetSelector } from "./components/preset-selector";
@@ -38,7 +39,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"; // Added Popover for color picker
+import { CounterClockwiseClockIcon } from "@radix-ui/react-icons";
 
 const HOTKEYS = {
   "ctrl+b": "bold",
@@ -49,14 +55,30 @@ const HOTKEYS = {
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
 
+// Color options for the color picker
+const COLORS = [
+  { name: "bg-black", value: "text-black" },
+  { name: "bg-blue-500", value: "text-blue-500" },
+  { name: "bg-green-500", value: "text-green-500" },
+  { name: "bg-red-500", value: "text-red-500" },
+  { name: "bg-yellow-500", value: "text-yellow-500" },
+  { name: "bg-purple-500", value: "text-purple-500" },
+];
+
 const MainPage = () => {
   const renderElement = useCallback((props) => <Element {...props} />, []);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
 
+  // Function to handle color change
+  const handleColorChange = (color) => {
+    Editor.addMark(editor, "color", color);
+  };
+
   return (
-    <div>
-      <div
+    <div className="w-full min-h-screen bg-gray-50">
+      <div className="w-full px-4">
+        <div
         className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16"
         dir="rtl"
       >
@@ -72,60 +94,146 @@ const MainPage = () => {
         </div>
       </div>
       <Separator />
-      <Tabs>
-        <Slate editor={editor} initialValue={initialValue}>
-          <div className="h-full py-6">
-            <div className="grid h-full gap-6 md:grid-cols-[auto_1fr]">
-              {/* Button Toolbar */}
-              <div className="flex flex-col space-y-6 pt-28">
-                {/* Text Formatting Buttons */}
-                <div className="flex space-x-2 p-2 bg-gray-100 rounded-lg">
-                  <MarkButton format="bold" icon={<Bold />} />
-                  <MarkButton format="italic" icon={<Italic />} />
-                  <MarkButton format="underline" icon={<Underline />} />
-                  <MarkButton format="code" icon={<Code />} />
+
+        <Tabs>
+          <Slate editor={editor} initialValue={initialValue}>
+            <div className="py-8">
+              <div className="grid gap-8 md:grid-cols-[320px_1fr]">
+                <div className="space-y-6">
+                  <div className="bg-white rounded-lg shadow-sm p-6 space-y-8">
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-gray-500">
+                        Text Formatting
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <MarkButton
+                          format="bold"
+                          icon={<Bold className="w-5 h-5" />}
+                        />
+                        <MarkButton
+                          format="italic"
+                          icon={<Italic className="w-5 h-5" />}
+                        />
+                        <MarkButton
+                          format="underline"
+                          icon={<Underline className="w-5 h-5" />}
+                        />
+                        <MarkButton
+                          format="code"
+                          icon={<Code className="w-5 h-5" />}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-gray-500">
+                        Structure
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <BlockButton
+                          format="heading-one"
+                          icon={<Heading1 className="w-5 h-5" />}
+                        />
+                        <BlockButton
+                          format="heading-two"
+                          icon={<Heading2 className="w-5 h-5" />}
+                        />
+                        <BlockButton
+                          format="numbered-list"
+                          icon={<ListOrdered className="w-5 h-5" />}
+                        />
+                        <BlockButton
+                          format="bulleted-list"
+                          icon={<List className="w-5 h-5" />}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-gray-500">
+                        Alignment
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <BlockButton
+                          format="left"
+                          icon={<AlignLeft className="w-5 h-5" />}
+                        />
+                        <BlockButton
+                          format="center"
+                          icon={<AlignCenter className="w-5 h-5" />}
+                        />
+                        <BlockButton
+                          format="right"
+                          icon={<AlignRight className="w-5 h-5" />}
+                        />
+                        <BlockButton
+                          format="justify"
+                          icon={<AlignJustify className="w-5 h-5" />}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-gray-500">Color</p>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="default"
+                            className="w-10 h-10 p-0"
+                          >
+                            <Palette className="w-5 h-5" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-48 p-3">
+                          <div className="grid grid-cols-3 gap-3">
+                            {COLORS.map((color, idx) => (
+                              <button
+                                key={idx}
+                                className={`w-10 h-10 rounded-lg ${color.name} hover:ring-2 ring-offset-2 transition-all`}
+                                onClick={() => handleColorChange(color.value)}
+                              />
+                            ))}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Block Formatting Buttons */}
-                <div className="flex space-x-2 p-2 bg-gray-100 rounded-lg">
-                  <BlockButton format="heading-one" icon={<Heading1 />} />
-                  <BlockButton format="heading-two" icon={<Heading2 />} />
-                  <BlockButton format="numbered-list" icon={<ListOrdered />} />
-                  <BlockButton format="bulleted-list" icon={<List />} />
-                </div>
-
-                {/* Alignment Buttons */}
-                <div className="flex space-x-2 p-2 bg-gray-100 rounded-lg">
-                  <BlockButton format="left" icon={<AlignLeft />} />
-                  <BlockButton format="center" icon={<AlignCenter />} />
-                  <BlockButton format="right" icon={<AlignRight />} />
-                  <BlockButton format="justify" icon={<AlignJustify />} />
-                </div>
-              </div>
-
-              {/* Editable Area */}
-              <div className="w-full lg:pr-5 md:pr-5">
-                <Editable
-                  className="w-full h-[500px] p-5 border rounded-md overflow-hidden"
-                  renderElement={renderElement}
-                  renderLeaf={renderLeaf}
-                  spellCheck
-                  autoFocus
-                  onKeyDown={(event) => {
-                    for (const hotkey in HOTKEYS) {
-                      if (isHotkey(hotkey, event)) {
-                        event.preventDefault();
-                        const mark = HOTKEYS[hotkey];
-                        toggleMark(editor, mark);
+                <div className="bg-white rounded-lg shadow-sm">
+                  <Editable
+                    className="min-h-[650px] p-8 focus:outline-none"
+                    renderElement={renderElement}
+                    renderLeaf={renderLeaf}
+                    spellCheck
+                    autoFocus
+                    onKeyDown={(event) => {
+                      for (const hotkey in HOTKEYS) {
+                        if (isHotkey(hotkey, event)) {
+                          event.preventDefault();
+                          const mark = HOTKEYS[hotkey];
+                          toggleMark(editor, mark);
+                        }
                       }
-                    }
-                  }}
-                />
+                    }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </Slate>
-      </Tabs>
+          </Slate>
+        </Tabs>
+
+        <div className="flex justify-end  space-x-2" >
+          <Button variant="outline" className="px-4">
+            <CounterClockwiseClockIcon className="w-5 h-5" />
+            <span className="sr-only">Show history</span>
+          </Button>
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6">
+            Submit
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
@@ -251,6 +359,9 @@ const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.underline) {
     children = <u>{children}</u>;
   }
+  if (leaf.color) {
+    children = <span className={leaf.color}>{children}</span>;
+  }
   return <span {...attributes}>{children}</span>;
 };
 
@@ -260,31 +371,30 @@ const BlockButton = ({ format, icon }) => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-    <Button
-      variant={
-        isBlockActive(
-          editor,
-          format,
-          TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
-        )
-          ? "default"
-          : "outline"
-      }
-      size="sm"
-      onMouseDown={(event) => {
-        event.preventDefault();
-        toggleBlock(editor, format);
-      }}
-    >
-      {icon}
-        </Button>
+          <Button
+            variant={
+              isBlockActive(
+                editor,
+                format,
+                TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
+              )
+                ? "default"
+                : "outline"
+            }
+            size="sm"
+            onMouseDown={(event) => {
+              event.preventDefault();
+              toggleBlock(editor, format);
+            }}
+          >
+            {icon}
+          </Button>
         </TooltipTrigger>
         <TooltipContent>
           <p>{format}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
-  
   );
 };
 

@@ -1,5 +1,4 @@
-import { CopyIcon } from "@radix-ui/react-icons";
-
+import { CopyIcon, CheckIcon } from "@radix-ui/react-icons"; // Added CheckIcon
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,8 +7,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useState } from "react"; // Added useState for feedback
 
 export function PresetShare() {
+  const [isCopied, setIsCopied] = useState(false); // State to track if text is copied
+
+  // Function to handle copying the link
+  const handleCopyLink = () => {
+    const link = document.getElementById("link").value;
+    navigator.clipboard.writeText(link).then(() => {
+      setIsCopied(true); // Show "Copied" feedback
+      setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
+    });
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -35,9 +46,21 @@ export function PresetShare() {
               className="h-9"
             />
           </div>
-          <Button type="submit" size="sm" className="px-3">
-            <span className="sr-only">Copy</span>
-            <CopyIcon className="h-4 w-4" />
+          <Button
+            type="submit"
+            size="sm"
+            className="px-3"
+            onClick={handleCopyLink} // Add click handler
+          >
+            {isCopied ? (
+              <>
+                <CheckIcon className="h-4 w-4" /> {/* Show check icon */}
+              </>
+            ) : (
+              <>
+                <CopyIcon className="h-4 w-4" /> {/* Show copy icon */}
+              </>
+            )}
           </Button>
         </div>
       </PopoverContent>
