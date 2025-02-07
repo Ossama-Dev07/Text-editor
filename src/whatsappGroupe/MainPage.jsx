@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react";
 import isHotkey from "is-hotkey";
-import { Editable, withReact, useSlate, Slate } from "slate-react";
+import { Editable, withReact, Slate } from "slate-react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -27,46 +27,21 @@ import {
   Underline,
   Palette,
   Eraser,
-} from "lucide-react"; // Added Palette icon
+} from "lucide-react";
 import { Tabs } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { PresetSelector } from "./components/preset-selector";
-import { PresetSave } from "./components/preset-save";
-import { CodeViewer } from "./components/code-viewer";
-import { PresetShare } from "./components/preset-share";
-import { PresetActions } from "./components/preset-actions";
-import { presets } from "./data/presets";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { CounterClockwiseClockIcon } from "@radix-ui/react-icons";
+import MarkButton from "./EditorUI/MarkButton";
+import BlockButton from "./EditorUI/BlockButton";
+import { COLORS, initialValue, HOTKEYS } from "./data";
+import Leaf from "./EditorUI/Leaf";
+import Element from "./EditorUI/Element";
 
-const HOTKEYS = {
-  "ctrl+b": "bold",
-  "ctrl+i": "italic",
-  "ctrl+u": "underline",
-  "ctrl+`": "code",
-};
-const LIST_TYPES = ["numbered-list", "bulleted-list"];
-const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
-
-// Color options for the color picker
-const COLORS = [
-  { name: "bg-black", value: "text-black" },
-  { name: "bg-blue-500", value: "text-blue-500" },
-  { name: "bg-green-500", value: "text-green-500" },
-  { name: "bg-red-500", value: "text-red-500" },
-  { name: "bg-yellow-500", value: "text-yellow-500" },
-  { name: "bg-purple-500", value: "text-purple-500" },
-];
 const MainPage = () => {
   const [messageFormat, setMessageFormat] = useState("wtsp");
   const renderElement = useCallback((props) => <Element {...props} />, []);
@@ -98,9 +73,7 @@ const MainPage = () => {
         );
       });
     } else {
-      // If there is no selection, reset the entire editor
       Editor.withoutNormalizing(editor, () => {
-        // Clear all marks (inline styles) for the entire editor
         Transforms.unsetNodes(editor, [], {
           match: (n) =>
             Editor.isEditor(n)
@@ -110,7 +83,6 @@ const MainPage = () => {
               : true, // Match text nodes
         });
 
-        // Reset block formatting (type and alignment) for the entire editor
         Transforms.setNodes(
           editor,
           { type: "paragraph", align: undefined },
@@ -241,7 +213,6 @@ const MainPage = () => {
                           className="w-10 h-10 p-0"
                           onClick={() => handleReset(editor)}
                         >
-                       
                           <Eraser />
                         </Button>
                       </div>
@@ -314,227 +285,6 @@ const MainPage = () => {
   );
 };
 
-const toggleBlock = (editor, format) => {
-  const isActive = isBlockActive(
-    editor,
-    format,
-    TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
-  );
-  const isList = LIST_TYPES.includes(format);
-  Transforms.unwrapNodes(editor, {
-    match: (n) =>
-      !Editor.isEditor(n) &&
-      SlateElement.isElement(n) &&
-      LIST_TYPES.includes(n.type) &&
-      !TEXT_ALIGN_TYPES.includes(format),
-    split: true,
-  });
-  let newProperties;
-  if (TEXT_ALIGN_TYPES.includes(format)) {
-    newProperties = {
-      align: isActive ? undefined : format,
-    };
-  } else {
-    newProperties = {
-      type: isActive ? "paragraph" : isList ? "list-item" : format,
-    };
-  }
-  Transforms.setNodes(editor, newProperties);
-  if (!isActive && isList) {
-    const block = { type: format, children: [] };
-    Transforms.wrapNodes(editor, block);
-  }
-};
 
-const toggleMark = (editor, format) => {
-  const isActive = isMarkActive(editor, format);
-  if (isActive) {
-    Editor.removeMark(editor, format);
-  } else {
-    Editor.addMark(editor, format, true);
-  }
-};
-
-const isBlockActive = (editor, format, blockType = "type") => {
-  const { selection } = editor;
-  if (!selection) return false;
-  const [match] = Array.from(
-    Editor.nodes(editor, {
-      at: Editor.unhangRange(editor, selection),
-      match: (n) =>
-        !Editor.isEditor(n) &&
-        SlateElement.isElement(n) &&
-        n[blockType] === format,
-    })
-  );
-  return !!match;
-};
-
-const isMarkActive = (editor, format) => {
-  const marks = Editor.marks(editor);
-  return marks ? marks[format] === true : false;
-};
-
-const Element = ({ attributes, children, element }) => {
-  const baseStyle = { textAlign: element.align };
-  const styles = {
-    "block-quote": {
-      ...baseStyle,
-      marginLeft: "20px",
-      paddingLeft: "10px",
-      borderLeft: "3px solid #ccc",
-      fontStyle: "italic",
-    },
-    "bulleted-list": {
-      ...baseStyle,
-      listStyleType: "disc",
-      paddingLeft: "20px",
-    },
-    "heading-one": {
-      ...baseStyle,
-      fontSize: "32px",
-      fontWeight: "bold",
-    },
-    "heading-two": {
-      ...baseStyle,
-      fontSize: "24px",
-      fontWeight: "bold",
-    },
-    "list-item": {
-      ...baseStyle,
-      display: "list-item",
-    },
-    "numbered-list": {
-      ...baseStyle,
-      listStyleType: "decimal",
-      paddingLeft: "20px",
-    },
-    default: {
-      ...baseStyle,
-      fontSize: "16px",
-    },
-  };
-  const elementStyle = styles[element.type] || styles.default;
-  return (
-    <div style={elementStyle} {...attributes}>
-      {children}
-    </div>
-  );
-};
-
-const Leaf = ({ attributes, children, leaf }) => {
-  if (leaf.bold) {
-    children = <strong>{children}</strong>;
-  }
-  if (leaf.code) {
-    children = <code>{children}</code>;
-  }
-  if (leaf.italic) {
-    children = <em>{children}</em>;
-  }
-  if (leaf.underline) {
-    children = <u>{children}</u>;
-  }
-  if (leaf.color) {
-    children = <span className={leaf.color}>{children}</span>;
-  }
-  return <span {...attributes}>{children}</span>;
-};
-
-const BlockButton = ({ format, icon ,msgformat}) => {
-  const editor = useSlate();
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant={
-              isBlockActive(
-                editor,
-                format,
-                TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
-              )
-                ? "default"
-                : "outline"
-            }
-            size="sm"
-            onMouseDown={(event) => {
-              event.preventDefault();
-              toggleBlock(editor, format);
-            }}
-            disabled={msgformat === "wtsp"}
-          >
-            {icon}
-            
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{format}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
-
-const MarkButton = ({ format, icon, name }) => {
-  const editor = useSlate();
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant={isMarkActive(editor, format) ? "default" : "outline"}
-            size="sm"
-            onMouseDown={(event) => {
-              event.preventDefault();
-              toggleMark(editor, format);
-            }}
-          >
-            {icon}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{format}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
-
-const initialValue = [
-  {
-    type: "paragraph",
-    children: [
-      { text: "This is editable " },
-      { text: "rich", bold: true },
-      { text: " text, " },
-      { text: "much", italic: true },
-      { text: " better than a " },
-      { text: "<textarea>", code: true },
-      { text: "!" },
-    ],
-  },
-  {
-    type: "paragraph",
-    children: [
-      {
-        text: "Since it's rich text, you can do things like turn a selection of text ",
-      },
-      { text: "bold", bold: true },
-      {
-        text: ", or add a semantically rendered block quote in the middle of the page, like this:",
-      },
-    ],
-  },
-  {
-    type: "paragraph",
-    children: [{ text: "A wise quote." }],
-  },
-  {
-    type: "paragraph",
-    align:"center",
-    children: [{ text: "Try it out for yourself!" }],
-  },
-];
 
 export default MainPage;
