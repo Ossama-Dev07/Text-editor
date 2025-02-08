@@ -28,7 +28,7 @@ const MarkButton = ({ format, icon, name }) => {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{format}</p>
+          <p>{name}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

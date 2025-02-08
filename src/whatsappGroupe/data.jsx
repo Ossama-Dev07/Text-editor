@@ -2,37 +2,26 @@ export const initialValue = [
   {
     type: "paragraph",
     children: [
-      { text: "This is editable " },
-      { text: "rich", bold: true },
-      { text: " text, " },
-      { text: "much", italic: true },
-      { text: " better than a " },
-      { text: "<textarea>", code: true },
-      { text: "!" },
-    ],
-  },
-  {
-    type: "paragraph",
-    children: [
       {
-        text: "Since it's rich text, you can do things like turn a selection of text ",
+        text: "نظرًا لأنه نص غني، يمكنك تنسيق النصوص بشكل احترافي مثل جعله ",
       },
-      { text: "bold", bold: true },
+      { text: "عريض", bold: true },
       {
-        text: ", or add a semantically rendered block quote in the middle of the page, like this:",
+        text: "، أو إضافة اقتباسات منسقة تظهر بشكل مناسب داخل الصفحة، كما هو موضح هنا:",
       },
     ],
   },
   {
     type: "paragraph",
-    children: [{ text: "A wise quote." }],
+    children: [{ text: "حكمة تُستلهم." }],
   },
   {
     type: "paragraph",
     align: "center",
-    children: [{ text: "Try it out for yourself!" }],
+    children: [{ text: "اختبره بنفسك الآن!" }],
   },
 ];
+
 export const COLORS = [
   { name: "bg-black", value: "text-black" },
   { name: "bg-blue-500", value: "text-blue-500" },
@@ -49,5 +38,3 @@ export const HOTKEYS = {
 };
 export const LIST_TYPES = ["numbered-list", "bulleted-list"];
 export const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
-
-

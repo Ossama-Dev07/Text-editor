@@ -11,7 +11,7 @@ import  isBlockActive  from "./isBlockActive";
 import  toggleBlock  from "./toggleBlock";
 import { TEXT_ALIGN_TYPES } from "../data";
 
-const BlockButton = ({ format, icon, msgformat }) => {
+const BlockButton = ({ format, icon, msgformat,name }) => {
   const editor = useSlate();
   return (
     <TooltipProvider>
@@ -38,7 +38,7 @@ const BlockButton = ({ format, icon, msgformat }) => {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{format}</p>
+          <p>{name}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

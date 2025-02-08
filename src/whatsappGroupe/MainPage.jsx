@@ -98,7 +98,7 @@ const MainPage = () => {
           className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16"
           dir="rtl"
         >
-          <h1 className="text-xl font-semibold">Whatsapp</h1>
+          <h1 className="text-xl font-semibold">واتساب</h1>
         </div>
         <Separator />
 
@@ -119,31 +119,35 @@ const MainPage = () => {
                     >
                       <div className="flex items-center gap-1 space-x-2">
                         <RadioGroupItem value="wtsp" id="r3" />
-                        <Label htmlFor="r3">Message Format WhatsApp</Label>
+                        <Label htmlFor="r3">صيغة الرسالة على واتساب</Label>
                       </div>
                       <div className="flex items-center gap-1 space-x-2">
                         <RadioGroupItem value="pdf" id="r2" />
-                        <Label htmlFor="r2">Message Format PDF</Label>
+                        <Label htmlFor="r2">صيغة الرسالة PDF</Label>
                       </div>
                     </RadioGroup>
                     <div className="space-y-3">
                       <p className="text-sm font-medium text-gray-500">
-                        Text Formatting
+                        تنسيق النص
                       </p>
                       <div className="flex flex-wrap gap-2">
                         <MarkButton
+                          name="عريض"
                           format="bold"
                           icon={<Bold className="w-5 h-5" />}
                         />
                         <MarkButton
+                          name="مائل"
                           format="italic"
                           icon={<Italic className="w-5 h-5" />}
                         />
                         <MarkButton
+                          name="تسطير"
                           format="underline"
                           icon={<Underline className="w-5 h-5" />}
                         />
                         <MarkButton
+                          name="كود"
                           format="code"
                           icon={<Code className="w-5 h-5" />}
                         />
@@ -152,25 +156,29 @@ const MainPage = () => {
 
                     <div className="space-y-3">
                       <p className="text-sm font-medium text-gray-500">
-                        Structure
+                        الهيكل
                       </p>
                       <div className="flex flex-wrap gap-2">
                         <BlockButton
+                          name="العنوان الأول"
                           format="heading-one"
                           icon={<Heading1 className="w-5 h-5" />}
                           msgformat={messageFormat}
                         />
                         <BlockButton
+                          name="العنوان الثاني"
                           format="heading-two"
                           icon={<Heading2 className="w-5 h-5" />}
                           msgformat={messageFormat}
                         />
                         <BlockButton
+                          name="قائمة مرقمة"
                           format="numbered-list"
                           icon={<ListOrdered className="w-5 h-5" />}
                           msgformat={messageFormat}
                         />
                         <BlockButton
+                          name="قائمة نقطية"
                           format="bulleted-list"
                           icon={<List className="w-5 h-5" />}
                           msgformat={messageFormat}
@@ -180,22 +188,26 @@ const MainPage = () => {
 
                     <div className="space-y-3">
                       <p className="text-sm font-medium text-gray-500">
-                        Alignment
+                        المحاذاة
                       </p>
                       <div className="flex flex-wrap gap-2">
                         <BlockButton
+                          name="يمين"
                           format="right"
                           icon={<AlignRight className="w-5 h-5" />}
                         />
                         <BlockButton
+                          name="مركز"
                           format="center"
                           icon={<AlignCenter className="w-5 h-5" />}
                         />
                         <BlockButton
+                          name="يسار"
                           format="left"
                           icon={<AlignLeft className="w-5 h-5" />}
                         />
                         <BlockButton
+                          name="محاذاة"
                           format="justify"
                           icon={<AlignJustify className="w-5 h-5" />}
                         />
@@ -205,7 +217,7 @@ const MainPage = () => {
                     <div className=" flex items-center justify-  gap-2">
                       <div>
                         <p className="text-sm font-medium text-gray-500">
-                          Reset
+                          إعادة التعيين
                         </p>
                         <Button
                           variant="outline"
@@ -218,7 +230,7 @@ const MainPage = () => {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-500">
-                          Color
+                          الألوان
                         </p>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -277,7 +289,7 @@ const MainPage = () => {
             <span className="sr-only">Show history</span>
           </Button>
           <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6">
-            Submit
+            ارسال
           </Button>
         </div>
       </div>
